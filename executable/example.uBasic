@@ -1,8 +1,6 @@
-RAKHO naam = PUCHO("Ap ka naam kya hai? ")
-AGAR naam == "Ameer" PHIR;
-	LINE_LIKHO("Salam developer, Ameer")
-WARNAAGAR naam == "User" PHIR
-	LINE_LIKHO("User koi nam nahi hota")
-WARNA
-	LINE_LIKHO("Assalam-o-Alikum "+naam)
+KAM fact(n)
+	AGAR n == 1 PHIR WAPIS n
+	WAPIS n*fact(n-1)
 KHATAM
+
+LINE_LIKHO("Factorial hai "+STR(fact(5)))
