@@ -10,6 +10,9 @@ In Pakistan it's often hard for students to grasp the concepts of programming in
 ## Environment
 This language is interpreted and both it's interpreter and parser are written entireley from scratch using python. It should be ran using PyPy(to make it fast, but if you don't care enough then CPython is good too), if one wants to run it directly from source but if you don't then I will try to make an exe package using Nuitka for it.
 
+## Complexity
+It's predecessor UrduScript was a language that compiled to JavaScript so it naturally had all the complexity of JavaScript, while UrduBASIC tries to be simple while providing enough features to be useable, such as "list generation".
+
 ## Why not "real" Urdu?
 There are many reasons as to why I decided to use Urduish instead of real Urdu and excluding all the reasons provided in UrduScript's page but they obviously was included in design process. First of all, today's generation is moving more towards Urduish than traditional Urdu because smart phones and stuff and then, it must be said that writing Urdu for most keyboards, for most people is horendous, innatural, and isn't native.
 
@@ -29,3 +32,6 @@ I should also point out that I will produce the most important examples from 10t
 
 # Documentation
 Well, I am working on it and it should be avalible pretty soon.
+
+# Goals
+This section is where, I ask for help. My current goal is to find a word for "FOR" because currently "FOR" keywords is used in language because of a lack of a better term in my vocabulary but I want your help to find an appropriate keyword for "FOR".
