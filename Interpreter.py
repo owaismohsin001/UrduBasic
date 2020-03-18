@@ -334,7 +334,7 @@ class List(Value):
             return self.multed_by(other)
         else:
             new_list = self.copy()
-            new_list.elements.append(other.value)
+            new_list.elements.append(other)
             return new_list, None
 
     def subbed_by(self, other):
@@ -380,6 +380,33 @@ class List(Value):
                     self.context,
                     "Ye number ki cheez list me mila hi nahi"
                 )
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def truth_of_list(self, other):
+        truth = []
+        if not isinstance(other, List): return False
+        for index, element in enumerate(self.elements):
+            if (0 <= index) and (index < len(other.elements)):
+                call = self.elements[index].get_comparison_eq(other.elements[index])[0]
+                if call:
+                    if call.state == 1:
+                        truth.append(True)
+                    else:
+                        break
+                else:
+                    break
+        return (len(truth) == len(self.elements)) and (len(truth) == len(other.elements))
+
+    def get_comparison_eq(self, other):
+        if isinstance(other, List):
+            return Boolean(int(self.truth_of_list(other))).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_ne(self, other):
+        if isinstance(other, List):
+            return Boolean(int(not self.truth_of_list(other))).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
