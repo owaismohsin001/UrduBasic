@@ -191,13 +191,13 @@ class Number(Value):
         if isinstance(other, Number):
             return Boolean(int(self.value == other.value)).set_context(self.context), None
         else:
-            return None, Value.illegal_operation(self, other)
+            return Boolean(0), None
 
     def get_comparison_ne(self, other):
         if isinstance(other, Number):
             return Boolean(int(self.value != other.value)).set_context(self.context), None
         else:
-            return None, Value.illegal_operation(self, other)
+            return Boolean(1), None
 
     def get_comparison_lt(self, other):
         if isinstance(other, Number):
@@ -287,13 +287,13 @@ class String(Value):
         if isinstance(other, String):
             return Boolean(int(self.value == other.value)).set_context(self.context), None
         else:
-            return None, Value.illegal_operation(self, other)
+            return Boolean(0), None
 
     def get_comparison_ne(self, other):
         if isinstance(other, String):
             return Boolean(int(self.value != other.value)).set_context(self.context), None
         else:
-            return None, Value.illegal_operation(self, other)
+            return Boolean(1), None
 
     def is_true(self):
         return len(self.value) > 0
@@ -385,6 +385,7 @@ class List(Value):
 
     def truth_of_list(self, other):
         truth = []
+        if len(other.elements) != len(self.elements): return False
         if not isinstance(other, List): return False
         for index, element in enumerate(self.elements):
             if (0 <= index) and (index < len(other.elements)):
@@ -402,13 +403,13 @@ class List(Value):
         if isinstance(other, List):
             return Boolean(int(self.truth_of_list(other))).set_context(self.context), None
         else:
-            return None, Value.illegal_operation(self, other)
+            return Boolean(0), None
 
     def get_comparison_ne(self, other):
         if isinstance(other, List):
             return Boolean(int(not self.truth_of_list(other))).set_context(self.context), None
         else:
-            return None, Value.illegal_operation(self, other)
+            return Boolean(1), None
 
     def is_true(self):
         return len(self.elements)>0
@@ -1097,6 +1098,18 @@ class Interpreter:
 
     def visit_BreakNode(self, node, context):
         return RTResult().success_break()
+
+    def visit_AssertNode(self, node, context):
+        res = RTResult()
+        assertion = res.register(self.visit(node.node_to_assert, context))
+        if res.should_return(): return res
+        if not assertion.is_true():
+            return res.failure(RTError(
+                    node.pos_start, node.pos_end,
+                    context,
+                    "Jo ap ne kaha wo sahi nahi"
+                ))
+        return res.success(null)
 
 #run
 global_symbol_table = SymbolTable()
