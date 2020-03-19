@@ -95,11 +95,17 @@ class Parser:
             res.register_advancement()
             self.advance()
             return res.success(BreakNode(pos_start, self.current_tok.pos_start.copy()))
+        if self.current_tok.matches(TT_KEYWORD, "KAHO"):
+            res.register_advancement()
+            self.advance()
+            expr = res.register(self.expr())
+            if res.error: return res
+            return res.success(AssertNode(expr, pos_start, self.current_tok.pos_start.copy()))
         expr = res.register(self.expr())
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'RAKHO', 'AGAR', 'FOR', 'JABKE', 'KAM', Number, naam, '+', '-', '(', '[', 'TODHO', 'SHURU', 'WAPIS', or 'NAHI'"
+                "Expected 'RAKHO', 'AGAR', 'FOR', 'JABKE', 'KAM', Number, naam, '+', '-', '(', '[', 'TODHO', 'SHURU', 'WAPIS', 'KAHO' or 'NAHI'"
             ))
         return res.success(expr)
 
@@ -599,6 +605,7 @@ class Parser:
                 res.register_advancement()
                 self.advance()
                 index = res.register(self.expr())
+                if res.error: return res
                 if self.current_tok.type != TT_RSQUARE:
                     return res.failure(InvalidSyntaxError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
