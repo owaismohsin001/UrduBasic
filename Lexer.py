@@ -1,5 +1,5 @@
 from Tokens import *
-from Errors import IllegalCharacterError
+from Errors import IllegalCharacterError, ExpectedCharError
 
 #Position
 class Position:
