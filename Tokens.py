@@ -48,7 +48,8 @@ KEYWORDS = [
     'KHATAM',
     'WAPIS',
     'SHURU',
-    'TODHO'
+    'TODHO',
+    'KAHO'
 ]
 
 class Token:
