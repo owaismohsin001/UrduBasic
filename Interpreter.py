@@ -638,15 +638,22 @@ class BuiltInFunction(BaseFunction):
     def execute_append(self, exec_ctx):
         given_list = exec_ctx.symbol_table.get("list")
         value = exec_ctx.symbol_table.get("value")
+        index = exec_ctx.symbol_table.get("index")
         if not isinstance(given_list, List):
             return RTResult().failure(RTError(
                 self.pos_start, self.pos_end,
                 exec_ctx,
                 "Pehla arument ek list honi chahiye"
             ))
+        if not isinstance(index, Number):
+            return RTResult().failure(RTError(
+                self.pos_start, self.pos_end,
+                exec_ctx,
+                "AAkhri arument ek list honi chahiye"
+            ))
         given_list.elements.append(value)
         return RTResult().success(null)
-    execute_append.arg_names = ['list', 'value']
+    execute_append.arg_names = ['list', 'value', 'index']
 
     def execute_str_conv(self, exec_ctx):
         given = exec_ctx.symbol_table.get("value")
