@@ -589,7 +589,8 @@ class Parser:
 
     def expr(self):
         res = ParseResult()
-        if self.current_tok.matches(TT_KEYWORD, 'RAKHO'):
+        if (self.current_tok.matches(TT_KEYWORD, 'RAKHO')) or (self.current_tok.matches(TT_KEYWORD, 'ABSE')):
+            type_ = self.current_tok
             res.register_advancement()
             self.advance()
             if self.current_tok.type != TT_IDENTIFIER:
@@ -622,7 +623,7 @@ class Parser:
             self.advance()
             expr = res.register(self.expr())
             if res.error: return res
-            return res.success(VarAssignNode(var_name, expr, index))
+            return res.success(VarAssignNode(var_name, type_, expr, index))
         node = res.register(self.bin_op(self.comp_expr, ((TT_KEYWORD, "OR"), (TT_KEYWORD, "YA"))))
         if res.error:
             return res.failure(InvalidSyntaxError(
