@@ -49,7 +49,8 @@ KEYWORDS = [
     'WAPIS',
     'SHURU',
     'TODHO',
-    'KAHO'
+    'KAHO',
+    'ABSE'
 ]
 
 class Token:
