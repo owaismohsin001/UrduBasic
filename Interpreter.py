@@ -333,13 +333,13 @@ class List(Value):
         if isinstance(other, List):
             return self.multed_by(other)
         else:
-            new_list = self.copy()
+            new_list = List(self.elements[:]).set_pos(self.pos_start, self.pos_end).set_context(self.context)
             new_list.elements.append(other)
             return new_list, None
 
     def subbed_by(self, other):
         if isinstance(other, Number):
-            new_list = self.copy()
+            new_list = List(self.elements[:]).set_pos(self.pos_start, self.pos_end).set_context(self.context)
             try:
                 new_list.elements.pop(other.value)
                 return new_list, None
@@ -364,7 +364,7 @@ class List(Value):
 
     def multed_by(self, other):
         if isinstance(other, List):
-            new_list = self.copy()
+            new_list = List(self.elements[:]).set_pos(self.pos_start, self.pos_end).set_context(self.context)
             new_list.elements.extend(other.elements)
             return new_list, None
         else:
@@ -856,6 +856,7 @@ class Context(object):
 class SymbolTable:
     def __init__(self, parent=None):
         self.symbols = {}
+        self.consts = []
         self.parent = parent
 
     def get(self, name):
@@ -865,6 +866,8 @@ class SymbolTable:
         return value
 
     def set(self, name, value, index=None):
+        if name in self.consts:
+            return None, RTError
         if index == None:
             self.symbols[name] = value
         else:
@@ -879,6 +882,14 @@ class SymbolTable:
                 else:
                     return None, None
         return self.symbols.get(name, None), None
+
+    def const_set(self, name, value, index=None):
+        got = self.get(name)
+        if name in self.consts:
+            return None, RTError
+        self.symbols[name] = value
+        self.consts.append(name)
+        return value, None
 
     def remove(self, name):
         del self.symbols[name]
@@ -929,20 +940,25 @@ class Interpreter:
     def visit_VarAssignNode(self, node, context):
         res = RTResult()
         var_name = node.var_name_tok.value
+        var_type = node.var_type.value
         index = node.index_node
         if index:
             index = res.register(self.visit(index, context))
             if res.should_return(): return res
         value = res.register(self.visit(node.value_node, context))
         if res.should_return(): return res
-        value, error = context.symbol_table.set(var_name, value, index)
-        if value == None:
+        if var_type == "ABSE":
+            value, error = context.symbol_table.const_set(var_name, value)
+        else:
+            value, error = context.symbol_table.set(var_name, value, index)
+        if error == RTError:
             return res.failure(RTError(
                 node.pos_start, node.pos_end,
                 context,
-                f"'{var_name}' list form mein defined nahi hai"
+                f"Mustakil value change nahi kar sakte"
             ))
-        if error:
+
+        if (value == None) or (error):
             return res.failure(RTError(
                 node.pos_start, node.pos_end,
                 context,
