@@ -649,9 +649,12 @@ class BuiltInFunction(BaseFunction):
             return RTResult().failure(RTError(
                 self.pos_start, self.pos_end,
                 exec_ctx,
-                "AAkhri arument ek list honi chahiye"
+                "Akhri arument ek list honi chahiye"
             ))
-        given_list.elements.append(value)
+        if index.value == -1:
+            given_list.elements.append(value)
+        else:
+            given_list.elements.insert(index.value, value)
         return RTResult().success(null)
     execute_append.arg_names = ['list', 'value', 'index']
 
