@@ -1036,6 +1036,12 @@ class Interpreter:
             if res.should_return(): return res
         else:
             step_value = Number(1)
+        if not isinstance(end_value, Number):
+            return res.failure(RTError(
+                node.pos_start, node.pos_end,
+                context,
+                "TAK ki value sirf number ho sakti hai"
+            ))
         i = start_value.value
         if step_value.value >= 0:
             condition = lambda: i < end_value.value
