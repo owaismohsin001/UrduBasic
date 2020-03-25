@@ -142,6 +142,10 @@ class Number(Value):
     def added_to(self, other):
         if isinstance(other, Number):
             return Number(self.value + other.value).set_context(self.context), None
+        elif isinstance(other, String):
+            return other.added_to(String(self))
+        elif isinstance(other, List):
+            return other.added_to(self)
         else:
             return None, Value.illegal_operation(self, self)
 
@@ -154,6 +158,8 @@ class Number(Value):
     def multed_by(self, other):
         if isinstance(other, Number):
             return Number(self.value * other.value).set_context(self.context), None
+        elif (isinstance(other, String)) or (isinstance(other, List)):
+            return other.multed_by(self)
         else:
             return None, Value.illegal_operation(self, other)
 
@@ -256,10 +262,10 @@ class String(Value):
         self.value = value
 
     def added_to(self, other):
-        if isinstance(other, String):
-            return String(self.value + other.value).set_context(self.context), None
+        if isinstance(other, List):
+            return other.added_to(self)
         else:
-            return None, Value.illegal_operation(self, other)
+            return String(self.value + str(other.value) or str(other.elements)).set_context(self.context), None
 
     def multed_by(self, other):
         if isinstance(other, Number):
