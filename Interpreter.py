@@ -147,7 +147,7 @@ class Number(Value):
         elif isinstance(other, List):
             return other.added_to(self)
         else:
-            return None, Value.illegal_operation(self, self)
+            return None, Value.illegal_operation(self, other)
 
     def subbed_by(self, other):
         if isinstance(other, Number):
