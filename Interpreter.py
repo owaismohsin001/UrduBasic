@@ -4,6 +4,7 @@ from Lexer import *
 from Nodes import *
 from Parser import *
 import os
+from math import isnan
 
 #RTResult
 class RTResult:
@@ -255,6 +256,26 @@ class Number(Value):
 
     def __repr__(self):
         return str(self.value)
+
+class Infinity(Number):
+    def __init__(self):
+        super().__init__(float('inf'))
+
+    def subbed_by(self, other):
+        if isinstance(other, Number):
+            number = Number(self.value - other.value).set_context(self.context)
+            return Number(0).set_context(self.context) if isnan(number.value) else number, None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def copy(self):
+        copy = Infinity()
+        copy.set_pos(self.pos_start, self.pos_end)
+        copy.set_context(self.context)
+        return copy
+
+    def __repr__(self):
+        return "LaMehdood"
 
 class String(Value):
     def __init__(self, value):
@@ -1154,9 +1175,11 @@ global_symbol_table = SymbolTable()
 null = nullObject()
 galat = Boolean(0)
 sahi = Boolean(1)
+inf = Infinity()
 global_symbol_table.const_set("khali", null)
 global_symbol_table.const_set("galat", galat)
 global_symbol_table.const_set("sahi", sahi)
+global_symbol_table.const_set("lamehdood", inf)
 global_symbol_table.set("LIKHO", BuiltInFunction.print)
 global_symbol_table.set("LINE_LIKHO", BuiltInFunction.println)
 global_symbol_table.set("LIKHO_WAPIS", BuiltInFunction.print_ret)
