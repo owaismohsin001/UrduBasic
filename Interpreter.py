@@ -158,7 +158,8 @@ class Number(Value):
 
     def multed_by(self, other):
         if isinstance(other, Number):
-            return Number(self.value * other.value).set_context(self.context), None
+            number = Number(self.value * other.value).set_context(self.context)
+            return Number(0).set_context(self.context) if isnan(number.value) else number, None
         elif (isinstance(other, String)) or (isinstance(other, List)):
             return other.multed_by(self)
         else:
@@ -265,6 +266,15 @@ class Infinity(Number):
         if isinstance(other, Number):
             number = Number(self.value - other.value).set_context(self.context)
             return Number(0).set_context(self.context) if isnan(number.value) else number, None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def multed_by(self, other):
+        if isinstance(other, Number):
+            number = Number(self.value * other.value).set_context(self.context)
+            return Number(0).set_context(self.context) if isnan(number.value) else number, None
+        elif (isinstance(other, String)) or (isinstance(other, List)):
+            return other.multed_by(self)
         else:
             return None, Value.illegal_operation(self, other)
 
