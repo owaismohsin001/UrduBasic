@@ -4,7 +4,7 @@ from Lexer import *
 from Nodes import *
 from Parser import *
 import os
-from math import isnan
+from math import isnan, sqrt
 
 #RTResult
 class RTResult:
@@ -843,6 +843,23 @@ class BuiltInFunction(BaseFunction):
         return RTResult().success(null)
     execute_run.arg_names = ['fn']
 
+    def execute_math_sqrt(self, exec_ctx):
+        num = exec_ctx.symbol_table.get("num")
+        if not isinstance(num, Number):
+            return RTResult().failure(RTError(
+                self.pos_start, self.pos_end,
+                exec_ctx,
+                "Pehla arument ek string honi chahiye"
+            ))
+        if num.value<0:
+            return RTResult().failure(RTError(
+                self.pos_start, self.pos_end,
+                exec_ctx,
+                "Pehla arument negative nahi hona chahiye"
+            ))
+        return RTResult().success(Number(sqrt(num.value)))
+    execute_math_sqrt.arg_names = ['num']
+
     def execute_exec(self, exec_ctx):
         given = exec_ctx.symbol_table.get("string")
         if not isinstance(given, String):
@@ -883,6 +900,7 @@ BuiltInFunction.split = BuiltInFunction("split_str")
 BuiltInFunction.len = BuiltInFunction("len")
 BuiltInFunction.run = BuiltInFunction("run")
 BuiltInFunction.exec = BuiltInFunction("exec")
+BuiltInFunction.math_sqrt = BuiltInFunction("math_sqrt")
 
 #Context
 class Context(object):
@@ -1211,6 +1229,7 @@ global_symbol_table.set("JODH", BuiltInFunction.join)
 global_symbol_table.set("LAMBAI", BuiltInFunction.len)
 global_symbol_table.set("CHALAO", BuiltInFunction.run)
 global_symbol_table.set("STR_CHALAO", BuiltInFunction.exec)
+global_symbol_table.set("MATH_SQRT", BuiltInFunction.math_sqrt)
 
 
 def run(fn, text):
