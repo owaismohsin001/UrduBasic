@@ -118,7 +118,7 @@ class Value:
     def notted(self):
         return None, self.illegal_operation(self)
 
-    def execute(self):
+    def execute(self, args):
         return RTResult().failure(self.illegal_operation())
 
     def is_true(self):
@@ -1143,6 +1143,17 @@ class Interpreter:
             return res.failure(error)
         else:
             return res.success(number.set_pos(node.pos_start, node.pos_end))
+
+    def visit_TryNode(self, node, context):
+        res = RTResult()
+        try_block = res.register(self.visit(node.try_block, context))
+        ret_value = try_block if node.may_return else null
+        if res.error:
+            res.reset()
+            except_block = res.register(self.visit(node.except_block, context))
+            if res.error: return res
+            ret_value = except_block if node.may_return else null
+        return res.success(ret_value)
 
     def visit_FuncDefNode(self, node, context):
         res = RTResult()
