@@ -462,6 +462,49 @@ class Parser:
         self.advance()
         return res.success(FuncDefNode(var_name_tok, arg_name_toks, body, False))
 
+    def try_expr(self):
+        res = ParseResult()
+        pos_start = self.current_tok.pos_start.copy()
+        if not self.current_tok.matches(TT_KEYWORD, "KOSHISH"):
+            return res.failure(InvalidSyntaxError(
+                pos_start, self.current_tok.pos_end,
+                "Expected NUMBER, 'KOSHISH'"
+            ))
+        res.register_advancement()
+        self.advance()
+        if self.current_tok.type == TT_NEWLINE:
+            try_block = res.register(self.statements())
+            if res.error: return res
+            if not self.current_tok.matches(TT_KEYWORD, "MUSHKIL"):
+                return res.failure(InvalidSyntaxError(
+                    pos_start, self.current_tok.pos_end,
+                    "Expected 'MUSHKIL'"
+                ))
+            res.register_advancement()
+            self.advance()
+            except_block = res.register(self.statements())
+            if res.error: return res
+            if not self.current_tok.matches(TT_KEYWORD, "KHATAM"):
+                return res.failure(InvalidSyntaxError(
+                    pos_start, self.current_tok.pos_end,
+                    "Expected 'KHATAM'"
+                ))
+            res.register_advancement()
+            self.advance()
+            return res.success(TryNode(try_block, except_block, False, pos_start, self.current_tok.pos_end))
+        try_block = res.register(self.statement())
+        if res.error: return res
+        if not self.current_tok.matches(TT_KEYWORD, "MUSHKIL"):
+            return res.failure(InvalidSyntaxError(
+                pos_start, self.current_tok.pos_end,
+                "Expected 'MUSHKIL'"
+            ))
+        res.register_advancement()
+        self.advance()
+        except_block = res.register(self.statement())
+        if res.error: return res
+        return res.success(TryNode(try_block, except_block, True, pos_start, self.current_tok.pos_end))
+
     def atom(self):
         res = ParseResult()
         tok = self.current_tok
@@ -511,6 +554,10 @@ class Parser:
             func_def = res.register(self.func_def())
             if res.error: return res
             return res.success(func_def)
+        elif self.current_tok.matches(TT_KEYWORD, 'KOSHISH'):
+            expr = res.register(self.try_expr())
+            if res.error: return res
+            return res.success(expr)
 
         return res.failure(InvalidSyntaxError(
         	tok.pos_start, tok.pos_end,
