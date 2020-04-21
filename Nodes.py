@@ -86,6 +86,17 @@ class WhileNode:
         self.pos_start = self.condition_node.pos_start
         self.pos_end = self.body_node.pos_end
 
+class TryNode(object):
+    def __init__(self, try_block, except_block, may_return, pos_start, pos_end):
+        self.try_block = try_block
+        self.except_block = except_block
+        self.may_return = may_return
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        return "try {"+f"{self.try_block}"+"} except {"+f"{self.except_block}"+"}"
+
 class FuncDefNode:
     def __init__(self, var_name_tok, arg_name_toks, body_node, should_auto_return):
         self.var_name_tok = var_name_tok
