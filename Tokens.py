@@ -50,7 +50,9 @@ KEYWORDS = [
     'SHURU',
     'TODHO',
     'KAHO',
-    'ABSE'
+    'ABSE',
+    'KOSHISH',
+    'MUSHKIL'
 ]
 
 class Token:
