@@ -879,6 +879,26 @@ class BuiltInFunction(BaseFunction):
         return RTResult().success(null)
     execute_exec.arg_names = ['string']
 
+    def execute_eval(self, exec_ctx):
+        given = exec_ctx.symbol_table.get("string")
+        if not isinstance(given, String):
+            return RTResult().failure(RTError(
+                self.pos_start, self.pos_end,
+                exec_ctx,
+                "Pehla arument ek string honi chahiye"
+            ))
+        result, error = run('string', given.value)
+        if error != None:
+            return RTResult().failure(RTError(
+                self.pos_start, self.pos_end,
+                exec_ctx,
+                f"string sahi se nahi chali kyu ke,\n"+
+                error.as_string()
+            ))
+        return RTResult().success(result)
+    execute_eval.arg_names = ['string']
+
+
 BuiltInFunction.print = BuiltInFunction("print")
 BuiltInFunction.println = BuiltInFunction("println")
 BuiltInFunction.print_ret = BuiltInFunction("print_ret")
@@ -900,6 +920,7 @@ BuiltInFunction.split = BuiltInFunction("split_str")
 BuiltInFunction.len = BuiltInFunction("len")
 BuiltInFunction.run = BuiltInFunction("run")
 BuiltInFunction.exec = BuiltInFunction("exec")
+BuiltInFunction.eval = BuiltInFunction("eval")
 BuiltInFunction.math_sqrt = BuiltInFunction("math_sqrt")
 
 #Context
@@ -1240,6 +1261,7 @@ global_symbol_table.set("JODH", BuiltInFunction.join)
 global_symbol_table.set("LAMBAI", BuiltInFunction.len)
 global_symbol_table.set("CHALAO", BuiltInFunction.run)
 global_symbol_table.set("STR_CHALAO", BuiltInFunction.exec)
+global_symbol_table.set("STR_WAPIS_CHALAO", BuiltInFunction.eval)
 global_symbol_table.set("MATH_SQRT", BuiltInFunction.math_sqrt)
 
 
