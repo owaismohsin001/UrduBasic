@@ -677,4 +677,31 @@ class Parser:
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expect kiya tha 'RAKHO', int, float, naam, '+', '-', 'AGAR', 'JABKE', 'FOR', '[', ya '('"
             ))
+        if self.current_tok.type == TT_LPAREN:
+            res.register_advancement()
+            self.advance()
+            arg_nodes = []
+            if self.current_tok.type == TT_RPAREN:
+                res.register_advancement()
+                self.advance()
+            else:
+                arg_nodes.append(res.register(self.expr()))
+                if res.error:
+                    return res.failure(InvalidSyntaxError(
+                        self.current_tok.pos_start, self.current_tok.pos_end,
+                        "Expect kiya tha ')', 'RAKHO', 'AGAR', 'FOR', 'JABKE', 'KAM', int, float, naam, '+', '-', '(', '[' ya 'NAHI'"
+                    ))
+                while self.current_tok.type == TT_COMMA:
+                    res.register_advancement()
+                    self.advance()
+                    arg_nodes.append(res.register(self.expr()))
+                    if res.error: return res
+                if self.current_tok.type != TT_RPAREN:
+                    res.failure(InvalidSyntaxError(
+                        self.current_tok.pos_start, self.current_tok.pos_end,
+                        "Expect kiya tha ',' ya ')'"
+                    ))
+                res.register_advancement()
+                self.advance()
+            return res.success(CallNode(node, arg_nodes))
         return res.success(node)
