@@ -576,8 +576,9 @@ class Function(BaseFunction):
         return f'function <{self.name}>'
 
 class BuiltInFunction(BaseFunction):
-    def __init__(self, name):
+    def __init__(self, name, scope):
         super().__init__(name)
+        self.scope = scope
 
     def execute(self, args):
         res = RTResult()
@@ -594,7 +595,7 @@ class BuiltInFunction(BaseFunction):
         raise Exception(f'No execute_{self.name} method defined')
 
     def copy(self):
-        copy = BuiltInFunction(self.name)
+        copy = BuiltInFunction(self.name, self.scope)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
         return copy
@@ -899,31 +900,6 @@ class BuiltInFunction(BaseFunction):
             ))
         return RTResult().success(result)
     execute_eval.arg_names = ['string']
-
-
-BuiltInFunction.print = BuiltInFunction("print")
-BuiltInFunction.println = BuiltInFunction("println")
-BuiltInFunction.print_ret = BuiltInFunction("print_ret")
-BuiltInFunction.input = BuiltInFunction("input")
-BuiltInFunction.input_int = BuiltInFunction("input_int")
-BuiltInFunction.clear = BuiltInFunction("clear")
-BuiltInFunction.is_number = BuiltInFunction("is_number")
-BuiltInFunction.is_string = BuiltInFunction("is_string")
-BuiltInFunction.is_list = BuiltInFunction("is_list")
-BuiltInFunction.is_function = BuiltInFunction("is_function")
-BuiltInFunction.append = BuiltInFunction("append")
-BuiltInFunction.pop = BuiltInFunction("pop")
-BuiltInFunction.extend = BuiltInFunction("extend")
-BuiltInFunction.list = BuiltInFunction("list_conv")
-BuiltInFunction.str = BuiltInFunction("str_conv")
-BuiltInFunction.num = BuiltInFunction("number_conv")
-BuiltInFunction.join = BuiltInFunction("join_list")
-BuiltInFunction.split = BuiltInFunction("split_str")
-BuiltInFunction.len = BuiltInFunction("len")
-BuiltInFunction.run = BuiltInFunction("run")
-BuiltInFunction.exec = BuiltInFunction("exec")
-BuiltInFunction.eval = BuiltInFunction("eval")
-BuiltInFunction.math_sqrt = BuiltInFunction("math_sqrt")
 
 #Context
 class Context(object):
@@ -1249,11 +1225,36 @@ class Interpreter:
         return res.success(null)
 
 #run
+context = Context('<main>')
 global_symbol_table = SymbolTable()
+context.symbol_table = global_symbol_table
 null = nullObject()
 galat = Boolean(0)
 sahi = Boolean(1)
 inf = Infinity()
+BuiltInFunction.print = BuiltInFunction("print", context)
+BuiltInFunction.println = BuiltInFunction("println", context)
+BuiltInFunction.print_ret = BuiltInFunction("print_ret", context)
+BuiltInFunction.input = BuiltInFunction("input", context)
+BuiltInFunction.input_int = BuiltInFunction("input_int", context)
+BuiltInFunction.clear = BuiltInFunction("clear", context)
+BuiltInFunction.is_number = BuiltInFunction("is_number", context)
+BuiltInFunction.is_string = BuiltInFunction("is_string", context)
+BuiltInFunction.is_list = BuiltInFunction("is_list", context)
+BuiltInFunction.is_function = BuiltInFunction("is_function", context)
+BuiltInFunction.append = BuiltInFunction("append", context)
+BuiltInFunction.pop = BuiltInFunction("pop", context)
+BuiltInFunction.extend = BuiltInFunction("extend", context)
+BuiltInFunction.list = BuiltInFunction("list_conv", context)
+BuiltInFunction.str = BuiltInFunction("str_conv", context)
+BuiltInFunction.num = BuiltInFunction("number_conv", context)
+BuiltInFunction.join = BuiltInFunction("join_list", context)
+BuiltInFunction.split = BuiltInFunction("split_str", context)
+BuiltInFunction.len = BuiltInFunction("len", context)
+BuiltInFunction.run = BuiltInFunction("run", context)
+BuiltInFunction.exec = BuiltInFunction("exec", context)
+BuiltInFunction.eval = BuiltInFunction("eval", context)
+BuiltInFunction.math_sqrt = BuiltInFunction("math_sqrt", context)
 global_symbol_table.const_set("khali", null)
 global_symbol_table.const_set("galat", galat)
 global_symbol_table.const_set("sahi", sahi)
@@ -1291,8 +1292,6 @@ def run(fn, text):
     ast = parser.parse()
     if ast.error: return None, ast.error
     interpreter = Interpreter()
-    context = Context('<main>')
-    context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)
 
     return result.value, result.error
