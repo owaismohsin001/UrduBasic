@@ -961,7 +961,7 @@ class SymbolTable:
 
     def copy(self):
         new_table = SymbolTable(self.parent)
-        new_table.symbols = deepcopy(self.symbols)
+        new_table.symbols = self.symbols
         return new_table
 
     def __repr__(self):
